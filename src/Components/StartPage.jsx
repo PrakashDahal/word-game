@@ -3,6 +3,7 @@ import { Box, Button, Typography } from "@mui/material";
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
 import '../App.css'
+import { SportsEsportsTwoTone } from '@mui/icons-material';
 
 class StartPage extends Component {
     state = {
@@ -12,25 +13,19 @@ class StartPage extends Component {
     render() {
         return (
             <>
-                <Box display="flex" mt={10}>
-                    <Box m="auto" mb={10}>
+                <Box className="centerContent" mt={10}>
+                    <Box m="auto" className='centerText'>
                         <Typography variant="h2">
                             Play Word Game
                         </Typography>
-                    </Box>
-                </Box>
 
-                <Box display="flex">
-                    <Box m="auto" mb={5}>
-                        <Button variant="outlined" size="medium" sx={{ m: 2 }}>Easy</Button>
-                        <Button variant="outlined" size="medium" sx={{ m: 2 }}>Meduim</Button>
-                        <Button variant="outlined" size="medium" sx={{ m: 2 }}>Hard</Button>
-                    </Box>
-                </Box>
+                        <Button variant="outlined" size="medium" sx={{ m: 2 }} startIcon={this.state.difficulty === 'easy' && <SportsEsportsTwoTone />}>
+                            Easy
+                        </Button>
+                        <Button variant="outlined" size="medium" sx={{ m: 2 }} disabled>Meduim</Button>
+                        <Button variant="outlined" size="medium" sx={{ m: 2 }} disabled>Hard</Button>
 
-                <Box display="flex">
-                    <Box m="auto">
-                        <Button variant="contained" size="large" startIcon={<PlayCircleOutlineIcon></PlayCircleOutlineIcon>} disabled={false}>Play</Button>
+                        <Button variant="contained" size="large" startIcon={<PlayCircleOutlineIcon></PlayCircleOutlineIcon>} disabled={false} onClick={this.props.playGame}>Play</Button>
                     </Box>
                 </Box>
             </>

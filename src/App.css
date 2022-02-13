@@ -1,3 +1,13 @@
 body{
     background-color: #fffbff;
 }
+
+.centerContent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.centerText{
+    text-align: center;
+}

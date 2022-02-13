@@ -15,7 +15,7 @@ function getRandomWord() {
 
     // suffle nicely
     // https://stackoverflow.com/questions/2724509/shuffling-words-in-a-sentence-in-javascript-coding-horror-how-to-improve
-    return word.split('').sort(() => Math.floor(Math.random() * Math.floor(3)) - 1)
+    return word.split('').sort(() => Math.floor(Math.random() * Math.floor(3)) - 1).join('')
 }
 
 class GamePage extends Component {
@@ -39,7 +39,7 @@ class GamePage extends Component {
             .then(res => res.json())
             .then(
                 (result) => {
-                    if (result.title == 'No Definitions Found') {
+                    if (result.title === 'No Definitions Found') {
                         console.log('Enter Valid word')
                     } else {
                         // separate marks calculation
@@ -58,20 +58,21 @@ class GamePage extends Component {
     }
 
     handleSubmit = (e) => {
-        if (this.state.currentWord.length > 2) {
-            // first check if it exist in the given word and the call api
-            this.checkWordExistence(this.state.currentWord)
-        }
-        const word = [...this.state.wordList, this.state.currentWord]
-        this.setState({
-            wordList: word,
-            currentWord: ''
-        })
         e.preventDefault()
+        if (this.state.timer > 0 && !this.state.wordList.includes(this.state.currentWord) && this.state.currentWord.length > 2) {
+            if (this.isValidSubString(this.state.randomWord, this.state.currentWord)) {
+                this.checkWordExistence(this.state.currentWord)
+            }
+            const word = [this.state.currentWord, ...this.state.wordList]
+            this.setState({
+                wordList: word,
+                currentWord: ''
+            })
+        }
     }
 
     componentDidMount() {
-        if(this.state.timer > 0){
+        if (this.state.timer > 0) {
             this.timerID = setInterval(
                 () => this.decreaseTimer(),
                 1000
@@ -88,42 +89,54 @@ class GamePage extends Component {
         this.setState({
             timer: timer
         })
+        if (timer <= 0) {
+            setTimeout(() => {
+                this.props.finishGame()
+            }, 5000);
+        }
+    }
+
+    isValidSubString(mainText, subText) {
+        if (subText) {
+            let cloneMainText = mainText
+            let validSubText = true
+            subText.split('').forEach(letter => {
+                if (cloneMainText.includes(letter)) {
+                    cloneMainText = cloneMainText.replace(letter, '')
+                } else {
+                    validSubText = false
+                }
+            });
+            return validSubText
+        }
+        return false
     }
 
 
     render() {
         return (
             <>
-                <Box display="flex" mt={10}>
-                    <Box m="auto" mb={5}>
-                        <Typography variant="h2">
+                <Box mt={10} className="centerContent">
+                    <Box m="auto" className='centerText'>
+                        <Typography variant="h2" sx={{ m: 4 }}>
                             Your word is:&nbsp;
                             <Box fontWeight='fontWeightMedium' display='inline'>
                                 {this.state.randomWord}
                             </Box>
                         </Typography>
-                    </Box>
-                </Box>
 
-                <Box display="flex">
-                    <Box m="auto" mb={5}>
-                        <Typography variant='h5'>
+                        <Typography variant='h5' sx={{ m: 4 }}>
                             Timer: <Chip label={this.state.timer} size="large" />
                         </Typography>
-                    </Box>
-                </Box>
 
-                <Box display="flex">
-                    <Box m="auto" mb={5}>
-                        <form onSubmit={this.handleSubmit}>
-                            <TextField id="matchingWords" label="Matching word" variant="outlined" size='large' onChange={this.handleEnter} value={this.state.currentWord} autoComplete="off" disabled={!this.state.timer>0}/>
+                        <form onSubmit={this.handleSubmit} sx={{ m: 4 }}>
+                            <TextField id="matchingWords" label="Matching word" variant="outlined" size='large' onChange={this.handleEnter} value={this.state.currentWord} autoComplete="off" disabled={!this.state.timer > 0} />
                         </form>
-                    </Box>
-                </Box>
 
-                <Box display="flex">
-                    <Box m="auto" mb={5}>
+                        {/* <Box sx={{ m: 4 }}> */}
                         <WordListComponent wordList={this.state.wordList} />
+                        {/* </Box> */}
+
                     </Box>
                 </Box>
 

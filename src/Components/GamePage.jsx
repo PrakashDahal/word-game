@@ -8,25 +8,25 @@ const randomWords = require('random-words');
 
 
 function getRandomWord() {
-    // Todo: take more words of array and take larger text words
-    // Eg; more than 4
     const word = randomWords({ exactly: 2, maxLength: 20 }).join('');
-
-
     // suffle nicely
     // https://stackoverflow.com/questions/2724509/shuffling-words-in-a-sentence-in-javascript-coding-horror-how-to-improve
     return word.split('').sort(() => Math.floor(Math.random() * Math.floor(3)) - 1).join('')
 }
 
 class GamePage extends Component {
+
+    constructor(props) {
+        super(props)
+    }
+
     state = {
         randomWord: getRandomWord(),
         currentWord: '',
         wordList: [],
-        mark: 0,
-        timer: 60
+        score: localStorage.getItem('score') || 0,
+        timer: this.getTimerValue(),
     }
-
 
     handleEnter = (e) => {
         this.setState({
@@ -42,11 +42,10 @@ class GamePage extends Component {
                     if (result.title === 'No Definitions Found') {
                         console.log('Enter Valid word')
                     } else {
-                        // separate marks calculation
-                        // 
-                        const mark = this.state.mark + 1
+                        const score = Number(this.state.score) + 1
+                        this.saveScores(score)
                         this.setState({
-                            mark: mark
+                            score: score
                         })
                     }
                 },
@@ -55,6 +54,10 @@ class GamePage extends Component {
                 }
             )
 
+    }
+
+    saveScores = (score) => {
+        localStorage.setItem('score', score);
     }
 
     handleSubmit = (e) => {
@@ -77,11 +80,33 @@ class GamePage extends Component {
                 () => this.decreaseTimer(),
                 1000
             );
+        } else {
+            clearInterval(this.timerID);
         }
     }
 
     componentWillUnmount() {
         clearInterval(this.timerID);
+    }
+
+    resetState() {
+        this.setState({
+            currentWord: '',
+            wordList: [],
+            score: localStorage.getItem('score') || 0,
+            timer: 0,
+        })
+    }
+
+    getTimerValue(){
+        const scoreVal = localStorage.getItem('score') || 0
+        if(scoreVal > 250){
+            return 30
+        } else if (scoreVal > 100){
+            return 45
+        } else {
+            return 60
+        }
     }
 
     decreaseTimer() {
@@ -90,9 +115,10 @@ class GamePage extends Component {
             timer: timer
         })
         if (timer <= 0) {
-            setTimeout(() => {
-                this.props.finishGame()
-            }, 5000);
+
+            this.resetState()
+            clearInterval(this.timerID);
+            this.props.finishGame()
         }
     }
 
@@ -125,26 +151,22 @@ class GamePage extends Component {
                             </Box>
                         </Typography>
 
-                        <Typography variant='h5' sx={{ m: 4 }}>
-                            Timer: <Chip label={this.state.timer} size="large" />
+                        <Typography variant='h4' sx={{ m: 4 }}>
+                            Score: {this.state.score} ,
+                            Timer: <Chip label={this.state.timer} size="large" sx={{ p: 2 }} />
                         </Typography>
 
                         <form onSubmit={this.handleSubmit} sx={{ m: 4 }}>
-                            <TextField id="matchingWords" label="Matching word" variant="outlined" size='large' onChange={this.handleEnter} value={this.state.currentWord} autoComplete="off" disabled={!this.state.timer > 0} />
+                            <TextField id="matchingWords" label="Matching word" variant="outlined" size='large'
+                                onChange={this.handleEnter} value={this.state.currentWord} autoComplete="off" disabled={!this.state.timer > 0} autoFocus
+                                helperText="More than 2 words are valid"
+                            />
                         </form>
 
-                        {/* <Box sx={{ m: 4 }}> */}
                         <WordListComponent wordList={this.state.wordList} />
-                        {/* </Box> */}
 
                     </Box>
                 </Box>
-
-
-                <Typography variant='h2'>
-                    {this.state.mark}
-                </Typography>
-
             </>
         );
     }

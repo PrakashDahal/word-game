@@ -6,7 +6,8 @@ import StartPage from "./Components/StartPage";
 class App extends Component {
 
   state = {
-    isPlay: false
+    isPlay: false,
+    timer: 60
   }
 
   startGame = () => {
@@ -16,10 +17,13 @@ class App extends Component {
   }
 
   finishGame = () => {
-    this.setState({
-      isPlay: false
-    })
+    setTimeout(() => {
+      this.setState({
+        isPlay: false
+      })
+    }, 3000);
   }
+
 
   getPage() {
     if (this.state.isPlay) {

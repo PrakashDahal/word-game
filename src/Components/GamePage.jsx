@@ -16,10 +16,6 @@ function getRandomWord() {
 
 class GamePage extends Component {
 
-    constructor(props) {
-        super(props)
-    }
-
     state = {
         randomWord: getRandomWord(),
         currentWord: '',

@@ -14,10 +14,6 @@ const DifficultyEnum = {
 }
 class StartPage extends Component {
 
-    constructor(props) {
-        super(props)
-    }
-
     getDifficultyLevel() {
         const scoreValue = this.getScore()
         if ( scoreValue > 250) {

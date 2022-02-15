@@ -1,4 +1,5 @@
 
+import { Alert, Collapse } from "@mui/material";
 import React, { Component } from "react";
 import GamePage from "./Components/GamePage";
 import StartPage from "./Components/StartPage";
@@ -35,6 +36,18 @@ class App extends Component {
   render() {
     return (
       <>
+        {
+          localStorage.getItem('score') > 500 &&
+          <Collapse in={true}>
+            <Alert variant="filled" color='success'>
+              <strong>
+                Congrats! you nailed it &nbsp;&nbsp;
+              </strong>
+              <br />
+              Reset to play from first winner.
+            </Alert>
+          </Collapse>
+        }
         {this.getPage()}
       </>
     );

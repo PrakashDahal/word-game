@@ -1,37 +1,33 @@
 import React, { Component } from 'react';
-import { Alert, Box, Chip, Collapse, Snackbar, TextField, Typography } from "@mui/material";
+import { Alert, Box, Chip, Collapse, IconButton, Snackbar, TextField, Typography } from "@mui/material";
+import WordListComponent from './WordListComponenet';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 import '../App.css'
-import WordListComponent from './WordListComponenet';
-
 const randomWords = require('random-words');
 
-
-function getRandomWord() {
-    const word = randomWords({ exactly: 2, maxLength: 20 }).join('');
-    // suffle nicely
-    // https://stackoverflow.com/questions/2724509/shuffling-words-in-a-sentence-in-javascript-coding-horror-how-to-improve
-    return word.split('').sort(() => Math.floor(Math.random() * Math.floor(3)) - 1).join('')
-}
-
-const appricationRules = {
-    5: 'Good One',
-    6: 'Very Good',
-    7: 'Fantastic',
-    8: 'Amazing',
-    9: 'Absolutely brilent'
-}
-
 class GamePage extends Component {
+    appricationRules = {
+        5: 'Good One',
+        6: 'Very Good',
+        7: 'Fantastic',
+        8: 'Amazing',
+        9: 'Absolutely brilent'
+    }
 
     state = {
-        randomWord: getRandomWord(),
+        randomWord: this.getRandomWord(),
         currentWord: '',
         wordList: [],
         score: localStorage.getItem('score') || 0,
         timer: this.getTimerValue(),
         snackOpen: false,
         finalMessage: false
+    }
+
+    getRandomWord() {
+        const word = randomWords({ exactly: 2, maxLength: 20 }).join('');
+        return word.split('').sort(() => Math.floor(Math.random() * Math.floor(3)) - 1).join('')
     }
 
     handleEnter = (e) => {
@@ -41,21 +37,13 @@ class GamePage extends Component {
         })
     }
 
-    appricateWork(word) {
-        if (word.length < 5) return
-        const message = appricationRules[word.length] || appricationRules['9']
-        this.handleOpenSnack(message)
-
-
-    }
-
     checkWordExistence = (word) => {
         fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word)
             .then(res => res.json())
             .then(
                 (result) => {
                     if (result.title === 'No Definitions Found') {
-                        console.log('Enter Valid word')
+                        this.handleOpenSnack('Word is invalid', 'warning')
                     } else {
                         const score = Number(this.state.score) + (word.length - 2)
                         this.appricateWork(word)
@@ -66,10 +54,9 @@ class GamePage extends Component {
                     }
                 },
                 (error) => {
-                    console.log(error);
+                    this.handleOpenSnack('Something went wrong', 'error')
                 }
             )
-
     }
 
     saveScores = (score) => {
@@ -79,7 +66,7 @@ class GamePage extends Component {
     handleSubmit = (e) => {
         e.preventDefault()
         if (!this.state.wordList.includes(this.state.currentWord)) {
-            if (this.state.timer > 0 && this.state.currentWord.length > this.getDifficultyWordSupport()) {
+            if (this.state.timer > 0 && this.state.currentWord.length > this.getDifficultyWordLength()) {
                 if (this.isValidSubString(this.state.randomWord, this.state.currentWord)) {
                     this.checkWordExistence(this.state.currentWord)
                 } else {
@@ -99,31 +86,6 @@ class GamePage extends Component {
         } else {
             this.handleOpenSnack('Already Exists', 'warning')
         }
-    }
-
-    componentDidMount() {
-        if (this.state.timer > 0) {
-            this.timerID = setInterval(
-                () => this.decreaseTimer(),
-                1000
-            );
-        } else {
-            clearInterval(this.timerID);
-        }
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.timerID);
-    }
-
-    resetState() {
-        this.setState({
-            currentWord: '',
-            wordList: [],
-            score: localStorage.getItem('score') || 0,
-            timer: 0,
-            finalMessage: true
-        })
     }
 
     getTimerValue() {
@@ -165,6 +127,12 @@ class GamePage extends Component {
         return false
     }
 
+    changeRandomWord = () => {
+        this.setState({
+            randomWord: this.getRandomWord()
+        })
+    }
+
     handleOpenSnack = (message, color = 'success') => {
         this.setState({
             snackOpen: true,
@@ -172,7 +140,6 @@ class GamePage extends Component {
             snackMessage: message,
             snackColor: color
         })
-
     }
 
     handleCloseSnack = () => {
@@ -181,17 +148,46 @@ class GamePage extends Component {
         })
     }
 
-    getDifficultyWordSupport(){
+    getDifficultyWordLength() {
         const scoreVal = localStorage.getItem('score') || 0
-        if(scoreVal>250) {
+        if (scoreVal > 250) {
             return 4
-        } else if(scoreVal > 100){
+        } else if (scoreVal > 100) {
             return 3
         }
         return 2
-
     }
 
+    appricateWork(word) {
+        if (word.length < 5) return
+        const message = this.appricationRules[word.length] || this.appricationRules['9']
+        this.handleOpenSnack(message)
+    }
+
+    componentDidMount() {
+        if (this.state.timer > 0) {
+            this.timerID = setInterval(
+                () => this.decreaseTimer(),
+                1000
+            );
+        } else {
+            clearInterval(this.timerID);
+        }
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timerID);
+    }
+
+    resetState() {
+        this.setState({
+            currentWord: '',
+            wordList: [],
+            score: localStorage.getItem('score') || 0,
+            timer: 0,
+            finalMessage: true
+        })
+    }
 
     render() {
         return (
@@ -213,6 +209,10 @@ class GamePage extends Component {
                             <Box fontWeight='fontWeightMedium' display='inline'>
                                 {this.state.randomWord}
                             </Box>
+
+                            <IconButton color="primary" aria-label="Change Word" onClick={this.changeRandomWord} size="large" sx={{ m: 2 }} disabled={this.state.timer <= 0}>
+                                <RestartAltIcon fontSize='large' />
+                            </IconButton>
                         </Typography>
 
                         <Typography variant='h4' sx={{ m: 4 }}>
@@ -223,11 +223,12 @@ class GamePage extends Component {
                         <form onSubmit={this.handleSubmit} sx={{ m: 4 }}>
                             <TextField id="matchingWords" label="Matching word" variant="outlined" size='large'
                                 onChange={this.handleEnter} value={this.state.currentWord} autoComplete="off" disabled={!this.state.timer > 0} autoFocus
-                                helperText={`More than ${this.getDifficultyWordSupport()} words are valid`}
+                                helperText={`More than ${this.getDifficultyWordLength()} words are valid`}
                             />
                         </form>
-                        <WordListComponent wordList={this.state.wordList} />
-
+                        <Box mt={2}>
+                            <WordListComponent wordList={this.state.wordList} />
+                        </Box>
                     </Box>
                 </Box>
 

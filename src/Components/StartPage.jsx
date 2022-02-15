@@ -14,6 +14,10 @@ const DifficultyEnum = {
 }
 class StartPage extends Component {
 
+    getScore() {
+        return localStorage.getItem('score') || 0
+    }
+
     getDifficultyLevel() {
         const scoreValue = this.getScore()
         if ( scoreValue > 250) {
@@ -23,10 +27,6 @@ class StartPage extends Component {
         } else {
             return DifficultyEnum.Easy
         }
-    }
-
-    getScore() {
-        return localStorage.getItem('score') || 0
     }
 
     checkCurrentDifficulty = (difficulty) => {
@@ -72,7 +72,7 @@ class StartPage extends Component {
                         </Button>
 
                         <Button variant="contained" size="large" sx={{ m: 3 }}
-                            startIcon={<RestartAltIcon></RestartAltIcon>} color="error"
+                            startIcon={<RestartAltIcon />} color="error"
                             onClick={this.resetScore}
                         >
                             Reset
@@ -81,8 +81,6 @@ class StartPage extends Component {
                         <br />
                         <br />
                         <Button variant="contained" size="large" startIcon={<PlayCircleOutlineIcon></PlayCircleOutlineIcon>} onClick={this.props.playGame}>Play</Button>
-
-
 
                         <Typography variant="h3" sx={{ m: 5 }}>
                             Your Score: {localStorage.getItem('score') || 0}

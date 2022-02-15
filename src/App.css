@@ -8,6 +8,10 @@ body{
     align-items: center;
 }
 
-.centerText{
+.centerText {
     text-align: center;
+}
+
+.largeFont {
+    font-size: 1rem !important;
 }

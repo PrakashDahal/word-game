@@ -47,7 +47,7 @@ class StartPage extends Component {
                 <Box className="centerContent" mt={10}>
                     <Box m="auto" className='centerText'>
                         <Typography variant="h2" mb={5}>
-                            Play Word Game
+                            Play Scramble Word Game
                         </Typography>
 
                         <Button variant="outlined" size="medium" sx={{ m: 3 }}

@@ -6,12 +6,11 @@ class WordListComponent extends Component {
     props = this.props
 
     getList = () => {
-        const list = this.props.wordList.map((word, index) => {
+        const list = Object.keys(this.props.wordList).map((word, index) => {
             return (
-                    <Box display="inline" key={index}  className='centerText'>
-                        {/* Todo: Color can be maintained for error words and valid words  Instead of length  => 5 */}
-                        <Chip variant="outlined" color={word.length >= 5 ? 'success' : 'primary'} label={word} size="large" sx={{m:1}} />
-                    </Box>
+                <Box display="inline" key={index} className='centerText'>
+                    <Chip variant="filled" color={this.props.wordList[word]} label={word} size="large" sx={{ m: 1, p: 1 }} className='largeFont' />
+                </Box>
             )
         })
         return list;

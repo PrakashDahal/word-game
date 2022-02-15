@@ -18,11 +18,11 @@ class GamePage extends Component {
     state = {
         randomWord: this.getRandomWord(),
         currentWord: '',
-        wordList: [],
+        wordList: {},
         score: localStorage.getItem('score') || 0,
         timer: this.getTimerValue(),
         snackOpen: false,
-        finalMessage: false
+        finalMessage: false,
     }
 
     getRandomWord() {
@@ -30,8 +30,8 @@ class GamePage extends Component {
         return word.split('').sort(() => Math.floor(Math.random() * Math.floor(3)) - 1).join('')
     }
 
-    handleEnter = (e) => {
-        const enteredText = e.target.value.toLowerCase()
+    handleInput = (e) => {
+        const enteredText = e.target.value.toLowerCase().trim()
         this.setState({
             currentWord: enteredText
         })
@@ -44,13 +44,12 @@ class GamePage extends Component {
                 (result) => {
                     if (result.title === 'No Definitions Found') {
                         this.handleOpenSnack('Word is invalid', 'warning')
+                        this.updateWord(word, 'warning')
                     } else {
-                        const score = Number(this.state.score) + (word.length - 2)
+                        this.updateWord(word, 'success')
                         this.appricateWork(word)
-                        this.saveScores(score)
-                        this.setState({
-                            score: score
-                        })
+                        const score = Number(this.state.score) + (word.length - 2)
+                        this.updateScore(score)
                     }
                 },
                 (error) => {
@@ -63,28 +62,38 @@ class GamePage extends Component {
         localStorage.setItem('score', score);
     }
 
+    updateScore = (score) => {
+        this.saveScores(score)
+        this.setState({
+            score: score
+        })
+    }
+
+    updateWord = (currentWord = this.state.currentWord, color = 'error') => {
+        const wordList = this.state.wordList
+        wordList[currentWord] = color
+        this.setState({
+            wordList: wordList,
+            currentWord: '',
+        })
+    }
+
     handleSubmit = (e) => {
         e.preventDefault()
-        if (!this.state.wordList.includes(this.state.currentWord)) {
-            if (this.state.timer > 0 && this.state.currentWord.length > this.getDifficultyWordLength()) {
-                if (this.isValidSubString(this.state.randomWord, this.state.currentWord)) {
-                    this.checkWordExistence(this.state.currentWord)
+        const currentWord = this.state.currentWord
+        if (this.state.timer > 0 && currentWord.length > this.getDifficultyWordLength()) {
+            if (!Object.keys(this.state.wordList).includes(currentWord)) {
+                this.updateWord()
+                if (this.isValidSubString(this.state.randomWord, currentWord)) {
+                    this.checkWordExistence(currentWord)
                 } else {
                     this.handleOpenSnack('Unmatching word', 'error')
                     const score = this.state.score > 0 ? Number(this.state.score) - 1 : 0
-                    this.saveScores(score)
-                    this.setState({
-                        score: score
-                    })
+                    this.updateScore(score)
                 }
-                const word = [this.state.currentWord, ...this.state.wordList]
-                this.setState({
-                    wordList: word,
-                    currentWord: ''
-                })
+            } else {
+                this.handleOpenSnack('Already Exists', 'warning')
             }
-        } else {
-            this.handleOpenSnack('Already Exists', 'warning')
         }
     }
 
@@ -182,7 +191,7 @@ class GamePage extends Component {
     resetState() {
         this.setState({
             currentWord: '',
-            wordList: [],
+            wordList: {},
             score: localStorage.getItem('score') || 0,
             timer: 0,
             finalMessage: true
@@ -221,8 +230,8 @@ class GamePage extends Component {
                         </Typography>
 
                         <form onSubmit={this.handleSubmit} sx={{ m: 4 }}>
-                            <TextField id="matchingWords" label="Matching word" variant="outlined" size='large'
-                                onChange={this.handleEnter} value={this.state.currentWord} autoComplete="off" disabled={!this.state.timer > 0} autoFocus
+                            <TextField id="matchingWords" variant="outlined" size='large' placeholder="cat..."
+                                onChange={this.handleInput} value={this.state.currentWord} autoComplete="off" disabled={!this.state.timer > 0} autoFocus
                                 helperText={`More than ${this.getDifficultyWordLength()} words are valid`}
                             />
                         </form>

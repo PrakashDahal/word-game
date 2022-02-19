@@ -22,7 +22,7 @@ class App extends Component {
       this.setState({
         isPlay: false
       })
-    }, 3000);
+    }, 4000);
   }
 
 

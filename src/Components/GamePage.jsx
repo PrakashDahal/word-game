@@ -244,12 +244,12 @@ class GamePage extends Component {
 
 
                         <form onSubmit={this.handleSubmit} sx={{ m: 4 }}>
-                            <TextField id="matchingWords" variant="outlined" size='large' placeholder="cat..."
+                            <TextField fullWidth id="matchingWords" variant="outlined" size='large' placeholder="taste, east, ..."
                                 onChange={this.handleInput} value={this.state.currentWord} autoComplete="off" disabled={!this.state.timer > 0} autoFocus
                                 helperText={`More than ${this.getDifficultyWordLength()} words are only valid`}
                             />
                         </form>
-                        <Box mt={2}>
+                        <Box mt={2} sx={{maxWidth: '800px'}}>
                             <WordListComponent wordList={this.state.wordList} />
                         </Box>
                     </Box>

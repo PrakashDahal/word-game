@@ -95,9 +95,9 @@ class StartPage extends Component {
                             <Typography variant="h5" sx={{ m: 5 }}>
                                 Easy: 0 - 100
                                 <br />
-                                Medium: 100 - 250
+                                Medium: 101 - 250
                                 <br />
-                                Hard: 250 - 500
+                                Hard: 251 - 500
                             </Typography>
                         </Card>
                     </Box>

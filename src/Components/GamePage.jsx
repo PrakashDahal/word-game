@@ -4,6 +4,7 @@ import WordListComponent from './WordListComponenet';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 import '../App.css'
+import Deadline from './Deadline';
 const randomWords = require('random-words');
 
 class GamePage extends Component {
@@ -37,9 +38,9 @@ class GamePage extends Component {
         })
     }
 
-    checkWordExistence = (word) => {
-        fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word)
-            .then(res => res.json())
+    checkWordExistence = async (word) => {
+        const data = fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + word)
+        data.then(res => res.json())
             .then(
                 (result) => {
                     if (result.title === 'No Definitions Found') {
@@ -222,17 +223,30 @@ class GamePage extends Component {
                             <IconButton color="primary" aria-label="Change Word" onClick={this.changeRandomWord} size="large" sx={{ m: 2 }} disabled={this.state.timer <= 0}>
                                 <RestartAltIcon fontSize='large' />
                             </IconButton>
+
                         </Typography>
 
-                        <Typography variant='h4' sx={{ m: 4 }}>
-                            Score: {this.state.score} ,
-                            Timer: <Chip label={this.state.timer} size="large" sx={{ p: 2 }} />
+                        <Typography variant='h4' sx={{ m: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+                            <div>
+                                Score:
+                                <b>
+                                    &nbsp; {this.state.score}
+                                </b>
+                            </div>
+                            <div>
+                                Timer: <Chip label={this.state.timer} size="large" sx={{ p: 2, fontSize: '20px' }} />
+                            </div>
                         </Typography>
+
+                        <Box mb={5}>
+                            <Deadline time={this.state.timer} totalTime={this.getTimerValue()} />
+                        </Box>
+
 
                         <form onSubmit={this.handleSubmit} sx={{ m: 4 }}>
                             <TextField id="matchingWords" variant="outlined" size='large' placeholder="cat..."
                                 onChange={this.handleInput} value={this.state.currentWord} autoComplete="off" disabled={!this.state.timer > 0} autoFocus
-                                helperText={`More than ${this.getDifficultyWordLength()} words are valid`}
+                                helperText={`More than ${this.getDifficultyWordLength()} words are only valid`}
                             />
                         </form>
                         <Box mt={2}>
